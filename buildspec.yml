@@ -1,28 +1,34 @@
 version: 0.2
+
 phases:
   pre_build:
     commands:
-      - export AWS_ACCOUNT_ID=183071452060
+      - export AWS_ACCOUNT_ID=121531024010
       - export AWS_DEFAULT_REGION=ap-northeast-2
       - export IMAGE_REPO_NAME=todo-app15
-      - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo "Using IMAGE_TAG=$IMAGE_TAG"
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - export IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c 1-7)
+      - export ECR_REGISTRY=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - export IMAGE_URI=$ECR_REGISTRY/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "Using IMAGE_URI=$IMAGE_URI"
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+
   build:
     commands:
-      - echo Build started on `date`
-      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "Build started on $(date)"
+      - docker build -t "$IMAGE_REPO_NAME:$IMAGE_TAG" .
+      - docker tag "$IMAGE_REPO_NAME:$IMAGE_TAG" "$IMAGE_URI"
+
   post_build:
     commands:
-      - docker push 121531024010.dkr.ecr.ap-northeast-2.amazonaws.com/todo-app15:$IMAGE_TAG
-      - "sed -i 's|image: .*todo-app15:.*|image: '$AWS_ACCOUNT_ID'.dkr.ecr.'$AWS_DEFAULT_REGION'.amazonaws.com/'$IMAGE_REPO_NAME':'$IMAGE_TAG'|g' todo_app.yaml"
+      - docker push "$IMAGE_URI"
+      - sed -i "s|image: .*todo-app15:.*|image: $IMAGE_URI|g" todo_app.yaml
       - git config user.email "codebuild@ci.local"
       - git config user.name "CodeBuild CI"
-      - git remote set-url origin https://$GITHUB_TOKEN@github.com/BlackBean99/todo-app15.git
+      - git remote set-url origin "https://${GITHUB_TOKEN}@github.com/BlackBean99/todo-app15.git"
       - git add todo_app.yaml
-      - "git commit -m 'ci: update image to '$IMAGE_TAG' [skip ci]' || echo 'No changes to commit'"
+      - git commit -m "ci: update image to $IMAGE_TAG [skip ci]" || echo "No changes to commit"
       - git push origin HEAD:main
+
 artifacts:
   files:
     - todo_app.yaml
