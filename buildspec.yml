@@ -15,7 +15,7 @@ phases:
       - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
   post_build:
     commands:
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push 121531024010.dkr.ecr.ap-northeast-2.amazonaws.com/todo-app15:$IMAGE_TAG
       - "sed -i 's|image: .*todo-app15:.*|image: '$AWS_ACCOUNT_ID'.dkr.ecr.'$AWS_DEFAULT_REGION'.amazonaws.com/'$IMAGE_REPO_NAME':'$IMAGE_TAG'|g' todo_app.yaml"
       - git config user.email "codebuild@ci.local"
       - git config user.name "CodeBuild CI"
