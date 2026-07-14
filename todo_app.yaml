@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app99
+  name: todo-app15
   labels:
-    app: todo-app99
+    app: todo-app15
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: todo-app99
+      app: todo-app15
   template:
     metadata:
       labels:
-        app: todo-app99
+        app: todo-app15
     spec:
       imagePullSecrets:
       - name: ecr-secret
       containers:
-      - name: todo-app99
-        image: Your_AWS_Account_ID.dkr.ecr.ap-northeast-2.amazonaws.com/todo-app99:latest
+      - name: todo-app15
+        image: 183071452060.dkr.ecr.ap-northeast-2.amazonaws.com/todo-app15:latest
         ports:
         - containerPort: 5000
