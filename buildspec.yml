@@ -21,12 +21,12 @@ phases:
   post_build:
     commands:
       - docker push "$IMAGE_URI"
-      - sed -i "s|image: .*todo-app15:.*|image: $IMAGE_URI|g" todo_app.yaml
+      - 'sed -i "s|image: .*todo-app15:.*|image: $IMAGE_URI|g" todo_app.yaml'
       - git config user.email "codebuild@ci.local"
       - git config user.name "CodeBuild CI"
-      - git remote set-url origin "https://${GITHUB_TOKEN}@github.com/BlackBean99/todo-app15.git"
+      - 'git remote set-url origin "https://${GITHUB_TOKEN}@github.com/BlackBean99/todo-app15.git"'
       - git add todo_app.yaml
-      - git commit -m "ci: update image to $IMAGE_TAG [skip ci]" || echo "No changes to commit"
+      - 'git commit -m "ci: update image to $IMAGE_TAG [skip ci]" || echo "No changes to commit"'
       - git push origin HEAD:main
 
 artifacts:
